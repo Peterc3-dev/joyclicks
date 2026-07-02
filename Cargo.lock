@@ -111,7 +111,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "keystick"
+name = "joyclicks"
 version = "0.1.0"
 dependencies = [
  "anyhow",

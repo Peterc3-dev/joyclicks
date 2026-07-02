@@ -1,8 +1,8 @@
-//! KeyStick — merge a physical gamepad (left hand) and a mouse (right hand) into a single
+//! JoyClicks — merge a physical gamepad (left hand) and a mouse (right hand) into a single
 //! virtual gamepad via uinput, so an emulator that only accepts one input device per pad
 //! (e.g. RPCS3) gets controller movement + mouse aim at the same time.
 //!
-//! The mouse is relative (velocity); a stick is absolute (position). KeyStick integrates
+//! The mouse is relative (velocity); a stick is absolute (position). JoyClicks integrates
 //! mouse motion into a right-stick deflection with a per-tick spring-back toward center, so
 //! turn rate ends up ~proportional to mouse speed and recenters when you stop moving.
 
@@ -125,7 +125,7 @@ fn build_virtual_pad() -> Result<VirtualDevice> {
     let hat = AbsInfo::new(0, -1, 1, 0, 0, 0);
 
     let vdev = VirtualDevice::builder()?
-        .name("KeyStick Virtual Gamepad")
+        .name("JoyClicks Virtual Gamepad")
         .with_keys(&keys)?
         .with_absolute_axis(&UinputAbsSetup::new(AbsoluteAxisCode::ABS_X, stick))?
         .with_absolute_axis(&UinputAbsSetup::new(AbsoluteAxisCode::ABS_Y, stick))?
@@ -172,7 +172,7 @@ fn reader_thread(
             Ok(_) => {}
             Err(nix::errno::Errno::EINTR) => continue,
             Err(e) => {
-                eprintln!("keystick: poll error on {} device: {e}", dev_kind(is_mouse));
+                eprintln!("joyclicks: poll error on {} device: {e}", dev_kind(is_mouse));
                 break;
             }
         }
@@ -180,7 +180,7 @@ fn reader_thread(
         let events = match dev.fetch_events() {
             Ok(ev) => ev,
             Err(e) => {
-                eprintln!("keystick: read error on {} device: {e}", dev_kind(is_mouse));
+                eprintln!("joyclicks: read error on {} device: {e}", dev_kind(is_mouse));
                 break;
             }
         };
@@ -249,8 +249,8 @@ fn main() -> Result<()> {
         .context("locating the gamepad (set devices.pad_name in config.toml)")?;
     let (mut mouse, mouse_name) = find_device(&cfg.devices.mouse_name, false)
         .context("locating the mouse (set devices.mouse_name in config.toml)")?;
-    println!("keystick: pad   = {pad_name}");
-    println!("keystick: mouse = {mouse_name}");
+    println!("joyclicks: pad   = {pad_name}");
+    println!("joyclicks: mouse = {mouse_name}");
 
     pad.grab()
         .context("grabbing the gamepad (is another instance running?)")?;
@@ -258,9 +258,9 @@ fn main() -> Result<()> {
 
     let mut vdev = build_virtual_pad().context("creating the virtual uinput gamepad")?;
     println!(
-        "keystick: virtual gamepad created — select it in RPCS3's Pad settings (SDL/evdev handler)."
+        "joyclicks: virtual gamepad created — select it in RPCS3's Pad settings (SDL/evdev handler)."
     );
-    println!("keystick: PS button toggles mouse grab (pause); Ctrl-C to quit.");
+    println!("joyclicks: PS button toggles mouse grab (pause); Ctrl-C to quit.");
 
     let quit = Arc::new(AtomicBool::new(false));
     let active = Arc::new(AtomicBool::new(true));
@@ -417,7 +417,7 @@ fn main() -> Result<()> {
     quit.store(true, Ordering::Relaxed);
     let _ = pad_handle.join();
     let _ = mouse_handle.join();
-    println!("\nkeystick: stopped.");
+    println!("\njoyclicks: stopped.");
     Ok(())
 }
 
@@ -445,11 +445,11 @@ fn config_watcher(aim: Arc<Mutex<config::Aim>>, quit: Arc<AtomicBool>) {
                         *aim.lock().unwrap_or_else(|e| e.into_inner()) = newcfg.aim;
                         last = Some(cur_mt);
                         println!(
-                            "keystick: config reloaded (sensitivity={}, y_scale={}, decay={})",
+                            "joyclicks: config reloaded (sensitivity={}, y_scale={}, decay={})",
                             newcfg.aim.sensitivity, newcfg.aim.y_scale, newcfg.aim.decay
                         );
                     }
-                    Err(e) => eprintln!("keystick: config reload failed: {e}"),
+                    Err(e) => eprintln!("joyclicks: config reload failed: {e}"),
                 }
             }
         }
@@ -548,7 +548,7 @@ fn apply_msg(
             *rx_f = 0.0;
             *ry_f = 0.0;
             println!(
-                "keystick: {}",
+                "joyclicks: {}",
                 if was_active {
                     "paused (mouse released)"
                 } else {
@@ -719,7 +719,7 @@ fn emit_diff(vdev: &mut VirtualDevice, last: &Desired, cur: &Desired) {
     }
     if !events.is_empty() {
         if let Err(e) = vdev.emit(&events) {
-            eprintln!("keystick: emit error: {e}");
+            eprintln!("joyclicks: emit error: {e}");
         }
     }
 }

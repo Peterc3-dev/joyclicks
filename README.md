@@ -1,10 +1,10 @@
-# KeyStick
+# JoyClicks
 
 Merge a physical **gamepad (left hand)** and a **mouse (right hand)** into a single
 **virtual gamepad** on Linux, so emulators that only accept one input device per pad
 (e.g. **RPCS3**) get controller movement + mouse aim at the same time.
 
-KeyStick grabs both real devices (so the emulator only ever sees the virtual pad — no
+JoyClicks grabs both real devices (so the emulator only ever sees the virtual pad — no
 double input), and converts relative mouse motion into a right-stick deflection with a
 spring-back toward center: **turn rate ≈ mouse speed**, and the stick recenters when you
 stop moving the mouse.
@@ -23,16 +23,16 @@ stop moving the mouse.
 | Wheel up / down | D-pad up / down (weapon) |
 | **PS button** | toggle grab — releases the mouse so you can alt-tab |
 
-All of this is configurable in `~/.config/keystick/config.toml` (written with defaults on
+All of this is configurable in `~/.config/joyclicks/config.toml` (written with defaults on
 first run).
 
 ## Run
 
 ```bash
-~/projects/keystick/target/release/keystick
+~/projects/joyclicks/target/release/joyclicks
 ```
 
-It prints the pad + mouse it locked onto, then creates **"KeyStick Virtual Gamepad"**.
+It prints the pad + mouse it locked onto, then creates **"JoyClicks Virtual Gamepad"**.
 `Ctrl-C` cleanly ungrabs both devices and removes the virtual pad.
 
 If it can't grab a device (permission denied): you're normally covered by the logind
@@ -43,18 +43,18 @@ aim doesn't feel steppy.
 
 ## RPCS3 setup (one time)
 
-1. Start KeyStick **before** opening the RPCS3 Pads dialog.
-2. RPCS3 → **Pads** → Handler = **SDL** (or evdev) → Device = **KeyStick Virtual Gamepad**.
+1. Start JoyClicks **before** opening the RPCS3 Pads dialog.
+2. RPCS3 → **Pads** → Handler = **SDL** (or evdev) → Device = **JoyClicks Virtual Gamepad**.
 3. Bind the sticks/buttons (click each, move stick / press). Save.
 4. **Set the right-stick Deadzone and Anti-Deadzone to 0** for this pad — RPCS3 auto-scales a
-   large deadzone to the 16-bit axis on bind, which eats/snaps small aim. KeyStick springs the
+   large deadzone to the 16-bit axis on bind, which eats/snaps small aim. JoyClicks springs the
    stick to exact center when idle, so 0 gives no drift. (Leave the left stick's deadzone for
    controller movement.)
 5. Play. Left hand on the controller, right hand on the mouse.
 
 ## Tuning (`config.toml`)
 
-The `[aim]` section is **hot-reloaded live** — edit and save, and KeyStick applies it within a
+The `[aim]` section is **hot-reloaded live** — edit and save, and JoyClicks applies it within a
 second without a restart or re-binding in the emulator (device names, `tick_hz`, and `[buttons]`
 still need a restart).
 

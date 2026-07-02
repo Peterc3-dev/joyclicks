@@ -1,4 +1,4 @@
-//! KeyStick configuration: loaded from ~/.config/keystick/config.toml (created with
+//! JoyClicks configuration: loaded from ~/.config/joyclicks/config.toml (created with
 //! sensible defaults on first run). All aim-feel tuning and the mouse button map live here.
 
 use anyhow::{Context, Result};
@@ -140,7 +140,7 @@ impl Config {
             .map(PathBuf::from)
             .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
             .context("neither XDG_CONFIG_HOME nor HOME is set")?;
-        Ok(base.join("keystick").join("config.toml"))
+        Ok(base.join("joyclicks").join("config.toml"))
     }
 
     /// Clamp aim values to sane ranges so a bad config can't pin or freeze the stick.
@@ -195,7 +195,7 @@ impl Config {
             let text = toml::to_string_pretty(&cfg).context("serializing default config")?;
             std::fs::write(&path, text)
                 .with_context(|| format!("writing {}", path.display()))?;
-            eprintln!("keystick: wrote default config to {}", path.display());
+            eprintln!("joyclicks: wrote default config to {}", path.display());
             Ok(cfg)
         }
     }
