@@ -1,0 +1,12 @@
+[package]
+name = "keystick"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.103"
+ctrlc = "3.5.2"
+evdev = "0.13.2"
+nix = { version = "0.31.3", features = ["poll", "fs"] }
+serde = { version = "1.0.228", features = ["derive"] }
+toml = "1.1.2"
